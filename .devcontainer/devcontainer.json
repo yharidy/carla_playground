@@ -1,0 +1,29 @@
+{
+  "name": "CARLA Development Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+        "settings": {
+            "terminal.integrated.defaultProfile.linux": "zsh"
+          },
+          "extensions": [
+            "ms-vscode.cpptools",
+            "ms-azuretools.vscode-docker",
+            "ms-vscode.cmake-tools"
+          ],
+    }
+  },
+  "forwardPorts": [2000, 2001],
+  "remoteUser": "root",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ,
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind"
+  ],
+  "runArgs": [
+    "-e", "SSH_AUTH_SOCK=${localEnv:SSH_AUTH_SOCK}"
+  ],
+  "postCreateCommand": "chmod 600 /home/vscode/.ssh/id_rsa"
+}
