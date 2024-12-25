@@ -21,10 +21,12 @@ services:
       context: ./docker/algorithms
       args:
         CARLA_VERSION: ${CARLA_VERSION}
+        USER_UID: ${USER_UID}
+        USER_GID: ${USER_GID}
     image: carla-algorithms:latest
     container_name: algorithms
     volumes:
-      - ~/.ssh:/root/.ssh:ro  # Mount the entire SSH directory to access keys
+      - ~/.ssh:/root/.ssh:rw  # Mount the entire SSH directory to access keys
       - ${SSH_AUTH_SOCK}:/ssh-agent  # Bind SSH socket
       - ${DOCKER_SOCKET}:/var/run/docker.sock 
       - /tmp/.X11-unix:/tmp/.X11-unix
@@ -34,6 +36,9 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent  # Match the mount path
       - CARLA_HOST=carla
       - DISPLAY=${DISPLAY}
+      - USER_UID=${USER_UID}
+      - USER_GID=${USER_GID}
+    user: "${USER_UID}:${USER_GID}"
     networks:
       - carla-net
   
