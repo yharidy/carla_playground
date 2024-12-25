@@ -55,10 +55,10 @@ RUN mkdir -p ~/carla-ros-bridge/catkin_ws/src && \
     cd ~/carla-ros-bridge && \
     git clone --recurse-submodules https://github.com/carla-simulator/ros-bridge.git catkin_ws/src/ros-bridge
 
-RUN /bin/bash -c "source /opt/ros/noetic/setup.bash" && \
-    cd ~/carla-ros-bridge/catkin_ws && \
+RUN  cd ~/carla-ros-bridge/catkin_ws && \
     apt-get update && \
+    apt-get install -y python3-catkin-tools && \
     rosdep update && \
-    rosdep install --from-paths src --ignore-src -r 
-    #catkin build
+    rosdep install --from-paths src --ignore-src -r && \
+    /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 CMD ["/bin/bash"]
