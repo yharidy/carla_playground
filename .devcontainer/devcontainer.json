@@ -1,29 +1,34 @@
 {
-  "name": "CARLA Development Environment",
-  "build": {
-    "dockerfile": "Dockerfile"
+  "name": "CARLA Playground",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "algorithms",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "docker-in-docker": {}
   },
   "customizations": {
     "vscode": {
         "settings": {
-            "terminal.integrated.defaultProfile.linux": "zsh"
+            "terminal.integrated.defaultProfile.linux": "bash",
+            "terminal.integrated.shell.linux": "/bin/bash"
           },
+          "ros.distro": "noetic",
           "extensions": [
             "ms-vscode.cpptools",
             "ms-azuretools.vscode-docker",
-            "ms-vscode.cmake-tools"
-          ],
+            "ms-vscode.cmake-tools",
+            "ms-python.python",
+            "ms-ros.vscode-ros",
+            "ms-vscode.cpptools",
+            "GitHub.copilot",
+            "GitHub.copilot-chat"
+          ]
     }
   },
-  "forwardPorts": [2000, 2001],
+  "overrideCommand": true,
+  "postCreateCommand": "git config --global --add safe.directory /workspace",  
   "remoteUser": "root",
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
-  ,
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind"
-  ],
-  "runArgs": [
-    "-e", "SSH_AUTH_SOCK=${localEnv:SSH_AUTH_SOCK}"
-  ],
-  "postCreateCommand": "chmod 600 /home/vscode/.ssh/id_rsa"
+  ]
 }
