@@ -12,6 +12,7 @@
             "terminal.integrated.defaultProfile.linux": "bash",
             "terminal.integrated.shell.linux": "/bin/bash"
           },
+          "remote.SSH.forwardAgent": true,
           "ros.distro": "noetic",
           "extensions": [
             "ms-vscode.cpptools",
@@ -26,7 +27,6 @@
     }
   },
   "overrideCommand": true,
-  "postCreateCommand": "git config --global --add safe.directory /workspace",  
   "remoteUser": "root",
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"

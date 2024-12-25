@@ -28,6 +28,13 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | a
 RUN apt-get update && apt-get install -y \
     ros-noetic-desktop-full
 
+# Set up SSH agent and ROS Noetic setup
+RUN echo 'if [ -z "$SSH_AGENT_PID" ]; then' >> /root/.bashrc && \
+echo '    eval $(ssh-agent -s)' >> /root/.bashrc && \
+echo 'fi' >> /root/.bashrc && \
+echo 'ssh-add -l > /dev/null || ssh-add ~/.ssh/id_rsa' >> /root/.bashrc && \
+echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
+
 # Make python3.8 the default python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
