@@ -1,14 +1,5 @@
 FROM ros:noetic
 ARG CARLA_VERSION
-# Get the UID and GID as build arguments
-# ARG USER_UID
-# ARG USER_GID
-# # Add user group with dynamic GID
-# RUN groupadd -g ${USER_GID} devuser || echo "Group with GID ${USER_GID} already exists"
-
-# # Add user with dynamic UID and GID
-# RUN useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash devuser
-# Set the user as the default
 USER root
 # Install system dependencies for building and running ROS and CARLA ROS bridge
 RUN apt-get update && apt-get install -y \
@@ -29,6 +20,13 @@ RUN apt-get update && apt-get install -y \
     ros-noetic-catkin \
     && rm -rf /var/lib/apt/lists/*
 
+# Set up C++ development environment
+RUN apt-get update && apt-get install -y \
+    g++ \
+    clang \
+    lldb \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set up ROS package sources
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | apt-key add -
@@ -37,29 +35,24 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | a
 RUN apt-get update && apt-get install -y \
     ros-noetic-desktop-full
 
-# Set up SSH agent and ROS Noetic setup
-RUN echo 'if [ -z "$SSH_AGENT_PID" ]; then' >> /root/.bashrc && \
-echo '    eval $(ssh-agent -s)' >> /root/.bashrc && \
-echo 'fi' >> /root/.bashrc && \
-echo 'ssh-add -l > /dev/null || ssh-add ~/.ssh/id_rsa' >> /root/.bashrc && \
-echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
+# Run ROS Noetic setup script in every new shell
+RUN echo 'source /opt/ros/noetic/setup.bash' >> /root/.bashrc
 
 # Make python3.8 the default python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
-# Set up C++ development environment
-RUN apt-get update && apt-get install -y \
-    g++ \
-    clang \
-    lldb \
-    && rm -rf /var/lib/apt/lists/*
 WORKDIR /root
+# Install Python dependencies
 COPY requirements.txt /root/requirements.txt
 RUN pip install --upgrade pip
 RUN pip install carla==${CARLA_VERSION} && \
     pip install -r /root/requirements.txt
-RUN rm -f /etc/apt/sources.list.d/ros1-latest.list
+
+# Remove redundant ROS 1 sources
+RUN rm -f /etc/apt/sources.list.d/ros1-latest.list 
+
+# Install CARLA ROS bridge
 RUN mkdir -p ~/carla-ros-bridge/catkin_ws/src && \
     cd ~/carla-ros-bridge && \
     git clone --recurse-submodules https://github.com/carla-simulator/ros-bridge.git catkin_ws/src/ros-bridge
@@ -71,5 +64,4 @@ RUN  cd ~/carla-ros-bridge/catkin_ws && \
     rosdep install --from-paths src --ignore-src -r && \
     /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 
-# USER devuser
 CMD ["/bin/bash"]
