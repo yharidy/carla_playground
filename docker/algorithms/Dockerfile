@@ -1,13 +1,13 @@
 FROM ros:noetic
 ARG CARLA_VERSION
 # Get the UID and GID as build arguments
-ARG USER_UID
-ARG USER_GID
-# Add user group with dynamic GID
-RUN groupadd -g ${USER_GID} devuser || echo "Group with GID ${USER_GID} already exists"
+# ARG USER_UID
+# ARG USER_GID
+# # Add user group with dynamic GID
+# RUN groupadd -g ${USER_GID} devuser || echo "Group with GID ${USER_GID} already exists"
 
-# Add user with dynamic UID and GID
-RUN useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash devuser
+# # Add user with dynamic UID and GID
+# RUN useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash devuser
 # Set the user as the default
 USER root
 # Install system dependencies for building and running ROS and CARLA ROS bridge
@@ -71,5 +71,5 @@ RUN  cd ~/carla-ros-bridge/catkin_ws && \
     rosdep install --from-paths src --ignore-src -r && \
     /bin/bash -c "source /opt/ros/noetic/setup.bash && catkin build"
 
-USER devuser
+# USER devuser
 CMD ["/bin/bash"]

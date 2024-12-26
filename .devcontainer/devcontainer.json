@@ -27,7 +27,7 @@
     }
   },
   "overrideCommand": true,
-  "remoteUser": "devuser",
+  "remoteUser": "root",
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
   ]
