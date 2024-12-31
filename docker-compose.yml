@@ -1,47 +1,49 @@
 services:
-  carla:
-    build:
-      context: ./docker/carla
-      args:
-        CARLA_VERSION: ${CARLA_VERSION}
-    image: carla-simulator:${CARLA_VERSION}
-    container_name: carla
-    environment:
-      - SDL_VIDEODRIVER=offscreen
-      - DISPLAY=${DISPLAY}
-    volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-    networks:
-      - carla-net
-    ports:
-      - "2000-2002:2000-2002"
 
   algorithms:
     build:
       context: ./docker/algorithms
       args:
         CARLA_VERSION: ${CARLA_VERSION}
-        USER_UID: ${USER_UID}
-        USER_GID: ${USER_GID}
     image: carla-algorithms:latest
     container_name: algorithms
-    volumes:
-      - ~/.ssh:/root/.ssh:rw  # Mount the entire SSH directory to access keys
-      - ${SSH_AUTH_SOCK}:/ssh-agent  # Bind SSH socket
-      - ${DOCKER_SOCKET}:/var/run/docker.sock 
-      - /tmp/.X11-unix:/tmp/.X11-unix
     env_file:
       - .env
     environment:
-      - SSH_AUTH_SOCK=/ssh-agent  # Match the mount path
-      - CARLA_HOST=carla
-      - DISPLAY=${DISPLAY}
-      - USER_UID=${USER_UID}
-      - USER_GID=${USER_GID}
-    user: "${USER_UID}:${USER_GID}"
+      - DISPLAY
+      - SDL_VIDEODRIVER
+    volumes:
+      - ./algorithms:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro
+    ports:
+      - "9090:9090"
     networks:
       - carla-net
   
+  carla:
+    build:
+      context: ./docker/carla
+      args:
+        CARLA_VERSION: ${CARLA_VERSION}
+    container_name: carla
+    image: carla-simulator:latest
+    environment:
+      - CARLA_VERSION
+      - DISPLAY
+      - SDL_VIDEODRIVER
+      - NVIDIA_VISIBLE_DEVICES
+      - CARLA_QUALITY
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro
+    networks:
+      - carla-net
+    ports:
+      - "2000-2002:2000-2002"
+    # Only include NVIDIA runtime if GPU is available
+    runtime: ${NVIDIA_RUNTIME:-runc}
+
 networks:
   carla-net:
     driver: bridge

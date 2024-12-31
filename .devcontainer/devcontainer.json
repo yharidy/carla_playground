@@ -3,9 +3,7 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "algorithms",
   "workspaceFolder": "/workspace",
-  "features": {
-    "docker-in-docker": {}
-  },
+  "features": {"ghcr.io/devcontainers/features/docker-in-docker:2": {}},
   "customizations": {
     "vscode": {
         "settings": {
@@ -19,7 +17,6 @@
             "ms-azuretools.vscode-docker",
             "ms-vscode.cmake-tools",
             "ms-python.python",
-            "ms-ros.vscode-ros",
             "ms-vscode.cpptools",
             "GitHub.copilot",
             "GitHub.copilot-chat"
@@ -29,6 +26,7 @@
   "overrideCommand": true,
   "remoteUser": "root",
   "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "source= /Users/mahinourelkafrawi/.colima/docker.sock,target=/var/run/docker.sock,type=bind"
   ]
 }

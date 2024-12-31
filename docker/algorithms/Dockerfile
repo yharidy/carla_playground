@@ -49,6 +49,9 @@ RUN pip install --upgrade pip
 RUN pip install carla==${CARLA_VERSION} && \
     pip install -r /root/requirements.txt
 
+# install docker
+RUN apt-get update && apt-get install -y docker.io
+
 # Remove redundant ROS 1 sources
 RUN rm -f /etc/apt/sources.list.d/ros1-latest.list 
 

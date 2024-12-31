@@ -1,2 +1,2 @@
 #!/bin/bash
-./CarlaUE4.sh -carla-server -nosound
+/home/carla/CarlaUE4.sh -carla-server -nosound
