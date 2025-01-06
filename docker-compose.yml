@@ -1,8 +1,8 @@
 services:
-
   algorithms:
     build:
       context: ./docker/algorithms
+      network: host
       args:
         CARLA_VERSION: ${CARLA_VERSION}
     image: carla-algorithms:latest
@@ -10,40 +10,46 @@ services:
     env_file:
       - .env
     environment:
-      - DISPLAY
-      - SDL_VIDEODRIVER
+      CARLA_VERSION: ${CARLA_VERSION}
+      DISPLAY: ${DISPLAY}
+      XAUTHORITY: ${XAUTHORITY}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      VK_LAYER_PATH: /usr/share/vulkan/explicit_layer.d
     volumes:
       - ./algorithms:/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro
-    ports:
-      - "9090:9090"
-    networks:
-      - carla-net
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
   
   carla:
     build:
       context: ./docker/carla
+      network: host
       args:
         CARLA_VERSION: ${CARLA_VERSION}
     container_name: carla
     image: carla-simulator:latest
     environment:
-      - CARLA_VERSION
-      - DISPLAY
-      - SDL_VIDEODRIVER
-      - NVIDIA_VISIBLE_DEVICES
-      - CARLA_QUALITY
+      CARLA_VERSION: ${CARLA_VERSION}
+      DISPLAY: ${DISPLAY}
+      XAUTHORITY: ${XAUTHORITY}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      VK_LAYER_PATH: /usr/share/vulkan/explicit_layer.d
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro
-    networks:
-      - carla-net
-    ports:
-      - "2000-2002:2000-2002"
-    # Only include NVIDIA runtime if GPU is available
-    runtime: ${NVIDIA_RUNTIME:-runc}
-
-networks:
-  carla-net:
-    driver: bridge
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/dri:/dev/dri
+      - ${XAUTHORITY}:${XAUTHORITY}
+      - /usr/share/vulkan/icd.d:/usr/share/vulkan/icd.d
+      - /usr/share/vulkan/explicit_layer.d:/usr/share/vulkan/explicit_layer.d
+    runtime: nvidia
+    network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              count: all

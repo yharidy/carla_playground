@@ -3,12 +3,15 @@
   "dockerComposeFile": ["../docker-compose.yml"],
   "service": "algorithms",
   "workspaceFolder": "/workspace",
-  "features": {"ghcr.io/devcontainers/features/docker-in-docker:2": {}},
+  "remoteEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+},
   "customizations": {
     "vscode": {
         "settings": {
             "terminal.integrated.defaultProfile.linux": "bash",
-            "terminal.integrated.shell.linux": "/bin/bash"
+            "terminal.integrated.shell.linux": "/bin/bash",
+            "http.proxyStrictSSL": false
           },
           "remote.SSH.forwardAgent": true,
           "ros.distro": "noetic",
@@ -26,7 +29,6 @@
   "overrideCommand": true,
   "remoteUser": "root",
   "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    "source= /Users/mahinourelkafrawi/.colima/docker.sock,target=/var/run/docker.sock,type=bind"
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
   ]
 }
